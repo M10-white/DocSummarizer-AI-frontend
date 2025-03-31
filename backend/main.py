@@ -29,7 +29,7 @@ def summarize_text_full(text):
         print(f"\n🧠 Résumé du bloc {i+1}/{len(chunks)}...")
         try:
             summary = summarize_chunk(chunk)
-            full_summary += f"\n• {summary}"
+            full_summary += summary.strip() + "\n\n"
         except Exception as e:
             print(f"❌ Erreur sur le bloc {i+1} : {e}")
     return full_summary.strip()
