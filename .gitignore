@@ -1,0 +1,7 @@
+
+.vscode/
+*.pdf
+*.docx
+resume.txt
+**/__pycache__
+*.pyc
