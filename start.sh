@@ -12,7 +12,7 @@ source backend/venv/Scripts/activate || source backend/venv/bin/activate
 # 2. Lancer le backend FastAPI
 echo -e "${GREEN}🔧 Backend (FastAPI) lancé sur http://localhost:8000...${NC}"
 cd backend
-uvicorn api:app --reload &
+uvicorn api:app &
 BACK_PID=$!
 cd ..
 

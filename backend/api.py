@@ -71,3 +71,7 @@ async def translate_text(data: dict):
         return {"translation": result[0]["translation_text"]}
     except Exception as e:
         return {"translation": f"[❌ Erreur de traduction : {str(e)}]"}
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}

@@ -8,6 +8,7 @@ function App() {
   const [translated, setTranslated] = useState("");
   const [translationLang, setTranslationLang] = useState("");
   const [loading, setLoading] = useState(false);
+  const [translating, setTranslating] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const [dragActive, setDragActive] = useState(false);
@@ -16,9 +17,19 @@ function App() {
   const [preview, setPreview] = useState("");
 
   useEffect(() => {
-    const timer = setTimeout(() => setInitialLoading(false), 1000);
-    return () => clearTimeout(timer);
-  }, []);
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch("http://localhost:8000/health");
+        if (res.ok) {
+          setInitialLoading(false);
+          clearInterval(interval);
+        }
+      } catch (err) {
+        console.error("Le backend n'est pas encore prêt :", err);
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);  
 
   const resetApp = () => {
     setFile(null);
@@ -108,7 +119,7 @@ function App() {
       }
     } catch (error) {
       console.error("Erreur lors du résumé :", error);
-      setErrorMessage("❌ Une erreur est survenue pendant le résumé.");
+      setErrorMessage("❌ Une erreur est survenue pendant le résumé. Veuillez réessayer.");
     }
     setLoading(false);
     setTimeout(() => setProgress(0), 500);
@@ -116,6 +127,7 @@ function App() {
 
   const handleTranslate = async () => {
     if (!summary || !translationLang) return;
+    setTranslating(true);
     try {
       const res = await axios.post("http://localhost:8000/translate", {
         summary,
@@ -125,6 +137,7 @@ function App() {
     } catch (err) {
       console.error("Erreur de traduction :", err);
     }
+    setTranslating(false);
   };
 
   if (initialLoading) {
@@ -199,27 +212,36 @@ function App() {
         )}
 
         {summary && (
-          <div className="mt-6 w-full max-w-2xl bg-white dark:bg-gray-700 p-6 rounded-xl shadow-xl animate-fade-in-up border border-slate-200 dark:border-gray-600">
-            <h2 className="text-2xl font-semibold mb-3 flex items-center text-slate-800 dark:text-gray-100">
-              <FileText className="mr-2" /> Résumé :
-            </h2>
-            <p className="whitespace-pre-line text-slate-700 dark:text-gray-300 leading-relaxed mb-4">{summary}</p>
-            <button onClick={handleDownload} className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition mb-4">
-              <Download size={18} /> Télécharger le résumé
-            </button>
-            <div className="flex items-center gap-2">
-              <Languages size={18} />
-              <select onChange={(e) => setTranslationLang(e.target.value)} value={translationLang} className="px-2 py-1 border rounded">
-                <option value="">Traduire en...</option>
-                <option value="fr">Français 🇫🇷</option>
-                <option value="en">Anglais 🇬🇧</option>
-              </select>
-              <button onClick={handleTranslate} className="ml-2 px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700">Traduire</button>
+          <div className={`mt-6 w-full max-w-6xl ${translated || translating ? "flex flex-col md:flex-row gap-6" : "flex justify-center"}`}>
+            <div className="w-full md:w-1/2 bg-white dark:bg-gray-700 p-6 rounded-xl shadow-xl border border-slate-200 dark:border-gray-600 animate-fade-in-up">
+              <h2 className="text-2xl font-semibold mb-3 flex items-center text-slate-800 dark:text-gray-100">
+                <FileText className="mr-2" /> Résumé :
+              </h2>
+              <p className="whitespace-pre-line text-slate-700 dark:text-gray-300 leading-relaxed mb-4">{summary}</p>
+              <button onClick={handleDownload} className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition mb-4">
+                <Download size={18} /> Télécharger le résumé
+              </button>
+              <div className="flex items-center gap-2">
+                <Languages size={18} />
+                <select onChange={(e) => setTranslationLang(e.target.value)} value={translationLang} className="px-2 py-1 border rounded">
+                  <option value="">Traduire en...</option>
+                  <option value="fr">Français 🇫🇷</option>
+                  <option value="en">Anglais 🇬🇧</option>
+                </select>
+                <button onClick={handleTranslate} className="ml-2 px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700">Traduire</button>
+              </div>
             </div>
-            {translated && (
-              <div className="mt-4 p-4 border-t border-slate-300 dark:border-gray-600">
-                <h3 className="text-lg font-semibold mb-2">🌍 Traduction :</h3>
-                <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">{translated}</p>
+
+            {(translated || translating) && (
+              <div className="w-full md:w-1/2 bg-white dark:bg-gray-700 p-6 rounded-xl shadow-xl border border-slate-200 dark:border-gray-600 animate-fade-in-up">
+                <h3 className="text-xl font-semibold mb-2">🌍 Traduction :</h3>
+                {translating ? (
+                  <p className="text-blue-500 animate-pulse flex items-center gap-2">
+                    <Loader className="animate-spin" size={18} /> Traduction en cours...
+                  </p>
+                ) : (
+                  <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">{translated || "Aucune traduction encore."}</p>
+                )}
               </div>
             )}
           </div>
