@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Moon, Sun, FileText, UploadCloud, Loader, Download, Eye, FilePlus2 } from "lucide-react";
+import { Moon, Sun, FileText, UploadCloud, Loader, Download, Eye, FilePlus2, Languages } from "lucide-react";
 
 function App() {
   const [file, setFile] = useState(null);
   const [summary, setSummary] = useState("");
+  const [translated, setTranslated] = useState("");
+  const [translationLang, setTranslationLang] = useState("");
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
@@ -21,6 +23,8 @@ function App() {
   const resetApp = () => {
     setFile(null);
     setSummary("");
+    setTranslated("");
+    setTranslationLang("");
     setErrorMessage("");
     setProgress(0);
     setPreview("");
@@ -104,10 +108,23 @@ function App() {
       }
     } catch (error) {
       console.error("Erreur lors du résumé :", error);
-      setErrorMessage("❌ Une erreur est survenue pendant le résumé. Veuillez vérifier que le backend fonctionne et que le fichier est valide.");
+      setErrorMessage("❌ Une erreur est survenue pendant le résumé.");
     }
     setLoading(false);
     setTimeout(() => setProgress(0), 500);
+  };
+
+  const handleTranslate = async () => {
+    if (!summary || !translationLang) return;
+    try {
+      const res = await axios.post("http://localhost:8000/translate", {
+        summary,
+        target_lang: translationLang,
+      });
+      if (res.data?.translation) setTranslated(res.data.translation);
+    } catch (err) {
+      console.error("Erreur de traduction :", err);
+    }
   };
 
   if (initialLoading) {
@@ -187,32 +204,26 @@ function App() {
               <FileText className="mr-2" /> Résumé :
             </h2>
             <p className="whitespace-pre-line text-slate-700 dark:text-gray-300 leading-relaxed mb-4">{summary}</p>
-            <button onClick={handleDownload} className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">
+            <button onClick={handleDownload} className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition mb-4">
               <Download size={18} /> Télécharger le résumé
             </button>
+            <div className="flex items-center gap-2">
+              <Languages size={18} />
+              <select onChange={(e) => setTranslationLang(e.target.value)} value={translationLang} className="px-2 py-1 border rounded">
+                <option value="">Traduire en...</option>
+                <option value="fr">Français 🇫🇷</option>
+                <option value="en">Anglais 🇬🇧</option>
+              </select>
+              <button onClick={handleTranslate} className="ml-2 px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700">Traduire</button>
+            </div>
+            {translated && (
+              <div className="mt-4 p-4 border-t border-slate-300 dark:border-gray-600">
+                <h3 className="text-lg font-semibold mb-2">🌍 Traduction :</h3>
+                <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">{translated}</p>
+              </div>
+            )}
           </div>
         )}
-
-        <style jsx>{`
-          @keyframes fade-in {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
-          @keyframes fade-in-up {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
-          @keyframes shake {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            50% { transform: translateX(5px); }
-            75% { transform: translateX(-5px); }
-            100% { transform: translateX(0); }
-          }
-          .animate-fade-in { animation: fade-in 0.6s ease-out forwards; }
-          .animate-fade-in-up { animation: fade-in-up 0.6s ease-out forwards; }
-          .animate-shake { animation: shake 0.4s ease-in-out; }
-        `}</style>
       </div>
     </div>
   );

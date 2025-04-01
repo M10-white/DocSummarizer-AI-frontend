@@ -1,6 +1,5 @@
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 from transformers import pipeline
 from extractor import extract_text_from_pdf, extract_text_from_docx
 from summarizer import summarize_text_full
@@ -51,21 +50,24 @@ async def extract_text(file: UploadFile = File(...)):
 
     return {"text": text[:3000]}
 
-
-translator_en_fr = pipeline("translation", model="Helsinki-NLP/opus-mt-en-fr")
-translator_fr_en = pipeline("translation", model="Helsinki-NLP/opus-mt-fr-en")
-
-class TranslationRequest(BaseModel):
-    summary: str
-    target_lang: str
+translator_en_fr = pipeline("translation_en_to_fr", model="Helsinki-NLP/opus-mt-en-fr")
+translator_fr_en = pipeline("translation_fr_to_en", model="Helsinki-NLP/opus-mt-fr-en")
 
 @app.post("/translate")
-def translate(req: TranslationRequest):
-    if req.target_lang == "fr":
-        translated = translator_en_fr(req.summary)[0]["translation_text"]
-    elif req.target_lang == "en":
-        translated = translator_fr_en(req.summary)[0]["translation_text"]
-    else:
-        return {"translation": "❌ Langue cible non supportée."}
-    
-    return {"translation": translated}
+async def translate_text(data: dict):
+    summary = data.get("summary")
+    target_lang = data.get("target_lang")
+
+    if not summary or not target_lang:
+        return {"translation": "[⛔ Résumé ou langue cible manquants]"}
+
+    try:
+        if target_lang == "fr":
+            result = translator_en_fr(summary)
+        elif target_lang == "en":
+            result = translator_fr_en(summary)
+        else:
+            return {"translation": "[⛔ Langue cible non supportée]"}
+        return {"translation": result[0]["translation_text"]}
+    except Exception as e:
+        return {"translation": f"[❌ Erreur de traduction : {str(e)}]"}
