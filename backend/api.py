@@ -1,5 +1,7 @@
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from transformers import pipeline
 from extractor import extract_text_from_pdf, extract_text_from_docx
 from summarizer import summarize_text_full
 
@@ -48,3 +50,22 @@ async def extract_text(file: UploadFile = File(...)):
         return {"text": f"[❌ Erreur lors de l’extraction : {str(e)}]"}
 
     return {"text": text[:3000]}
+
+
+translator_en_fr = pipeline("translation", model="Helsinki-NLP/opus-mt-en-fr")
+translator_fr_en = pipeline("translation", model="Helsinki-NLP/opus-mt-fr-en")
+
+class TranslationRequest(BaseModel):
+    summary: str
+    target_lang: str
+
+@app.post("/translate")
+def translate(req: TranslationRequest):
+    if req.target_lang == "fr":
+        translated = translator_en_fr(req.summary)[0]["translation_text"]
+    elif req.target_lang == "en":
+        translated = translator_fr_en(req.summary)[0]["translation_text"]
+    else:
+        return {"translation": "❌ Langue cible non supportée."}
+    
+    return {"translation": translated}
