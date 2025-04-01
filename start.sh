@@ -1,35 +1,26 @@
 #!/bin/bash
 
-# Couleur pour le terminal
 GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 
 echo -e "${GREEN}🚀 Lancement de l'application DocSummarizer-AI...${NC}"
 
-# 1. Lancer le backend FastAPI
-echo -e "${GREEN}🔧 Démarrage du backend FastAPI...${NC}"
+# 1. Démarrage du backend FastAPI
+echo -e "${GREEN}🔧 Backend (FastAPI) lancé sur http://localhost:8000...${NC}"
 cd backend
 uvicorn api:app --reload &
-BACKEND_PID=$!
+BACK_PID=$!
 cd ..
 
-# 2. Lancer le frontend (React ou simple serveur)
-echo -e "${GREEN}🎨 Démarrage du frontend...${NC}"
+# 2. Démarrage du frontend React
+echo -e "${GREEN}🎨 Frontend (React) lancé sur http://localhost:3000...${NC}"
 cd frontend
-
-if [ -f "package.json" ]; then
-  npm install
-  npm start &
-  FRONT_PID=$!
-else
-  # Sinon, simple serveur avec Python
-  python -m http.server 3000 &
-  FRONT_PID=$!
-fi
-
+npm start &
+FRONT_PID=$!
 cd ..
 
-# Attente propre de l'arrêt
-trap "echo -e '${GREEN}🛑 Arrêt en cours...'; kill $BACKEND_PID $FRONT_PID" SIGINT
+# 3. Gestion propre de l'arrêt
+trap "echo -e '\n${GREEN}🛑 Arrêt en cours...'; kill $BACK_PID $FRONT_PID" SIGINT
 
-wait $BACKEND_PID $FRONT_PID
+# 4. Attendre les deux processus
+wait $BACK_PID $FRONT_PID
