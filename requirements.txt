@@ -1,8 +1,0 @@
-transformers
-torch
-pdfplumber
-python-docx
-langdetect
-streamlit
-fastapi
-uvicorn
