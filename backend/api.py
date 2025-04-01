@@ -16,20 +16,21 @@ app.add_middleware(
 @app.post("/summarize")
 async def summarize(file: UploadFile = File(...)):
     contents = await file.read()
-    path = f"files/{file.filename}"
+    filename = file.filename.lower()
 
-    with open(path, "wb") as f:
-        f.write(contents)
-
-    if file.filename.endswith(".pdf"):
-        text = extract_text_from_pdf(path)
-    elif file.filename.endswith(".docx"):
-        text = extract_text_from_docx(path)
-    else:
-        return {"summary": "❌ Format non pris en charge."}
+    try:
+        if filename.endswith(".pdf"):
+            text = extract_text_from_pdf(contents)
+        elif filename.endswith(".docx"):
+            text = extract_text_from_docx(contents)
+        else:
+            return {"summary": "❌ Format non pris en charge."}
+    except Exception as e:
+        return {"summary": f"❌ Erreur pendant l'extraction du texte : {str(e)}"}
 
     summary = summarize_text_full(text)
     return {"summary": summary}
+
 
 @app.post("/extract")
 async def extract_text(file: UploadFile = File(...)):

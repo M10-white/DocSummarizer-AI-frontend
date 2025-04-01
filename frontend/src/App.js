@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Moon, Sun, FileText, UploadCloud, Loader, Download, Eye, RotateCcw } from "lucide-react";
+import { Moon, Sun, FileText, UploadCloud, Loader, Download, Eye, FilePlus2 } from "lucide-react";
 
 function App() {
   const [file, setFile] = useState(null);
@@ -21,8 +21,9 @@ function App() {
   const resetApp = () => {
     setFile(null);
     setSummary("");
-    setPreview("");
     setErrorMessage("");
+    setProgress(0);
+    setPreview("");
   };
 
   const handleFileChange = async (e) => {
@@ -120,15 +121,17 @@ function App() {
   return (
     <div className={`${darkMode ? "dark" : ""}`}>
       <div className="min-h-screen bg-gradient-to-b from-white via-slate-100 to-slate-200 dark:from-gray-900 dark:to-gray-800 text-slate-800 dark:text-gray-200 flex flex-col items-center justify-center p-8 transition-all duration-300 ease-in-out" onDragEnter={handleDrag}>
+        <div className="absolute top-4 left-4">
+          {summary && (
+            <button onClick={resetApp} className="flex items-center gap-2 px-3 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition">
+              <FilePlus2 size={18} /> Nouvelle génération
+            </button>
+          )}
+        </div>
+
         <button onClick={() => setDarkMode(!darkMode)} className="absolute top-4 right-4 p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition">
           {darkMode ? <Sun size={20} /> : <Moon size={20} />}
         </button>
-
-        {summary && (
-          <button onClick={resetApp} className="absolute top-4 left-4 p-2 rounded-full bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 transition">
-            <RotateCcw size={20} />
-          </button>
-        )}
 
         <h1 className="text-4xl font-extrabold mb-6 flex items-center gap-2">
           <FileText className="text-blue-700 dark:text-yellow-400" />
