@@ -42,7 +42,7 @@ def summarize_chunk(text):
     )
     return summary[0]['summary_text']
 
-def summarize_text_full(text, chunk_size=1000):
+def summarize_text_full(text, chunk_size=300):
     print("📄 Découpage du texte et résumé multi-blocs...")
     chunks = []
     words = text.split()
