@@ -15,6 +15,7 @@ function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [progress, setProgress] = useState(0);
   const [preview, setPreview] = useState("");
+  const [loadingMessage, setLoadingMessage] = useState("Analyse du contenu...");
 
   useEffect(() => {
     const interval = setInterval(async () => {
@@ -29,7 +30,7 @@ function App() {
       }
     }, 1000);
     return () => clearInterval(interval);
-  }, []);  
+  }, []);
 
   const resetApp = () => {
     setFile(null);
@@ -39,6 +40,7 @@ function App() {
     setErrorMessage("");
     setProgress(0);
     setPreview("");
+    setLoadingMessage("Analyse du contenu...");
   };
 
   const handleFileChange = async (e) => {
@@ -96,6 +98,21 @@ function App() {
     if (!file) return;
     setLoading(true);
     setProgress(10);
+    setLoadingMessage("📄 Lecture du fichier...");
+
+    const messages = [
+      "📄 Lecture du fichier...",
+      "🤖 Pré-traitement du contenu...",
+      "🧠 Résumé en cours de génération...",
+      "🔍 Finalisation..."
+    ];
+
+    let messageIndex = 0;
+    const messageInterval = setInterval(() => {
+      messageIndex = (messageIndex + 1) % messages.length;
+      setLoadingMessage(messages[messageIndex]);
+    }, 1500);
+
     const formData = new FormData();
     formData.append("file", file);
 
@@ -111,6 +128,7 @@ function App() {
       });
 
       setProgress(100);
+      clearInterval(messageInterval);
       if (typeof response.data?.summary === "string") {
         setSummary(response.data.summary.trim());
       } else {
@@ -118,6 +136,7 @@ function App() {
         throw new Error("Résumé introuvable dans la réponse.");
       }
     } catch (error) {
+      clearInterval(messageInterval);
       console.error("Erreur lors du résumé :", error);
       setErrorMessage("❌ Une erreur est survenue pendant le résumé. Veuillez réessayer.");
     }
@@ -191,14 +210,14 @@ function App() {
             )}
 
             <button onClick={handleSummarize} disabled={!file || loading} className="px-6 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition duration-300 ease-in-out disabled:opacity-50">
-              {loading ? <span className="flex items-center gap-2"><Loader className="animate-spin" size={18} /> Résumé en cours...</span> : "Générer le résumé"}
+              {loading ? <span className="flex items-center gap-2"><Loader className="animate-spin" size={18} /> {loadingMessage}</span> : "Générer le résumé"}
             </button>
           </>
         )}
 
         {loading && (
           <div className="mt-4 w-full max-w-md">
-            <p className="text-blue-600 dark:text-blue-400 font-medium mb-1">💡 L'IA travaille... Veuillez patienter.</p>
+            <p className="text-blue-600 dark:text-blue-400 font-medium mb-1">💡 {loadingMessage}</p>
             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
               <div className="bg-blue-600 h-2.5 rounded-full transition-all duration-300" style={{ width: `${progress}%` }}></div>
             </div>
