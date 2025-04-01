@@ -15,7 +15,11 @@ def detect_language(text):
         return 'en'
 
 def summarize_chunk(text):
-    input_length = len(text.split())
+    words = text.split()
+    if not words or len(words) < 5:
+        return "[⛔ Chunk trop court pour être résumé]"
+
+    input_length = len(words)
     max_len = min(200, int(input_length * 0.8))
     min_len = min(80, max(30, int(max_len * 0.5)))
 
@@ -27,6 +31,7 @@ def summarize_chunk(text):
 
     summarizer = summarizers[lang]
 
+    print(f"🧾 Chunk ({len(text.split())} mots) : {text[:150]}...")
     summary = summarizer(
         text,
         max_length=max_len,
@@ -36,3 +41,24 @@ def summarize_chunk(text):
         early_stopping=True
     )
     return summary[0]['summary_text']
+
+def summarize_text_full(text, chunk_size=1000):
+    print("📄 Découpage du texte et résumé multi-blocs...")
+    chunks = []
+    words = text.split()
+    for i in range(0, len(words), chunk_size):
+        chunk = " ".join(words[i:i+chunk_size])
+        chunks.append(chunk)
+
+    summaries = []
+    for i, chunk in enumerate(chunks):
+        print(f"\n🧠 Résumé du bloc {i+1}/{len(chunks)}...")
+        try:
+            summary = summarize_chunk(chunk)
+            summaries.append(summary)
+        except Exception as e:
+            print(f"⚠️ Erreur dans le résumé du bloc {i+1}: {e}")
+            summaries.append("[Résumé indisponible pour ce bloc]")
+
+    return "\n\n".join(summaries)
+
