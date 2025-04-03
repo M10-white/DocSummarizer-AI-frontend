@@ -1,85 +1,70 @@
-# 📄 DocSummarizer AI
+# Getting Started with Create React App
 
-**DocSummarizer-AI** est une application web utilisant l'intelligence artificielle pour extraire, résumer et traduire automatiquement le contenu de documents PDF ou DOCX.
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
----
+## Available Scripts
 
-## 🚀 Fonctionnalités
+In the project directory, you can run:
 
-- 🔍 **Extraction** de texte depuis des fichiers `.pdf` et `.docx`
-- ✂️ **Résumé intelligent** via modèle Pegasus (transformers)
-- 🌍 **Traduction automatique** (anglais ↔ français)
-- 🎨 **Interface utilisateur** moderne et responsive avec React
-- 🌙 **Mode sombre** activable
+### `npm start`
 
----
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-## 🧠 Tech Stack
+The page will reload when you make changes.\
+You may also see any lint errors in the console.
 
-| Frontend        | Backend        | IA / NLP            |
-|-----------------|----------------|---------------------|
-| React + Tailwind| FastAPI        | Transformers (HuggingFace) |
-| Axios           | Uvicorn        | Pegasus, MarianMT   |
+### `npm test`
 
----
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-## 📦 Installation locale
+### `npm run build`
 
-```bash
-# Cloner le repo
-git clone https://github.com/ton-utilisateur/docsummarizer-ai.git
-cd docsummarizer-ai
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
 
-# Lancer le backend
-cd backend
-python -m venv venv
-venv\Scripts\activate  # Windows
-source venv/bin/activate  # Mac/Linux
-pip install -r requirements.txt
-uvicorn api:app --reload
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
 
-# Lancer le frontend
-cd ../frontend
-npm install
-npm start
-```
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
----
+### `npm run eject`
 
-## 🛠️ Structure du projet
+**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-```
-docsummarizer-ai/
-├── backend/
-│   ├── api.py
-│   ├── summarizer.py
-│   ├── extractor.py
-│   └── ...
-├── frontend/
-│   ├── public/
-│   ├── src/
-│   │   └── App.js
-│   └── ...
-└── README.md
-```
+If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
----
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
-## 📄 Licence
+You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-Ce projet est sous licence MIT.
+## Learn More
 
----
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-## 🤝 Contribuer
+To learn React, check out the [React documentation](https://reactjs.org/).
 
-Les contributions sont bienvenues !  
-Fork le projet, crée une branche, envoie un PR 💡
+### Code Splitting
 
----
+This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
 
-## ✨ Remerciements
+### Analyzing the Bundle Size
 
-- [HuggingFace 🤗](https://huggingface.co/)
-- [TailwindCSS](https://tailwindcss.com/)
-- [FastAPI](https://fastapi.tiangolo.com/)
+This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+
+### Making a Progressive Web App
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+
+### Advanced Configuration
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+
+### Deployment
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+
+### `npm run build` fails to minify
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
